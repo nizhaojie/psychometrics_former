@@ -17,6 +17,7 @@ const routes = [
         path: '/', component: LayoutVue,redirect:'/questionnaire/overview', children: [
             { path: '/questionnaire/overview', component: QuestionnaireOverview },
             { path: '/questionnaire/info', component: Questionnaire },
+            { path: '/user/info', component: UserInfoVue },
             { path: '/user/avatar', component: UserAvatarVue },
             { path: '/user/resetPassword', component: UserResetPasswordVue }
         ]

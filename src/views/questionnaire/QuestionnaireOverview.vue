@@ -10,12 +10,17 @@
         </template>
         <el-table :data="questionnaire" style="width: 100%">
             <!-- <el-table-column label="序号" width="70" prop="id"> </el-table-column> -->
-            <el-table-column label="问卷名称" prop="name" width="300">
+            <el-table-column label="问卷名称" prop="name" width="250">
                 <template #default="scope">
                     <div class="clickable" @click="openQuestionnaire(scope?.row?.id,scope?.row?.name)">{{ scope?.row?.name }}</div>
                 </template>
             </el-table-column>
             <el-table-column label="问卷介绍" prop="description"></el-table-column>
+            <el-table-column label="标签" prop="tag" width="100">
+                <template #default="scope">
+                    <el-tag size="large" :type="scope?.row?.tag==='智力'?'success':(scope?.row?.tag==='情商'?'primary':(scope?.row?.tag==='职业'?'warning':'danger'))">{{ scope?.row?.tag }}</el-tag>
+                </template>
+            </el-table-column>
             <el-table-column label="操作" width="120">
                 <template #default="{ row }">
                     <el-button :icon="Edit" circle plain type="primary" @click="showDialog(row)"></el-button>
@@ -28,13 +33,66 @@
         </el-table>
 
         <!-- 添加问卷弹窗 -->
-        <el-dialog v-model="dialogVisible" :title="title" width="30%">
-            <el-form :model="questionnaireModel" :rules="rules" label-width="100px" style="padding-right: 30px">
+        <el-dialog v-model="dialogVisible" :title="title" width="80%">
+            <el-form :model="questionnaireModel" :rules="rules" label-width="120px" style="padding-right: 30px" :inline="true">
                 <el-form-item label="问卷名称" prop="name">
                     <el-input v-model="questionnaireModel.name" minlength="1" maxlength="15"></el-input>
                 </el-form-item>
                 <el-form-item label="问卷介绍" prop="description">
                     <el-input v-model="questionnaireModel.description" minlength="1" maxlength="50"></el-input>
+                </el-form-item>
+                <el-form-item label="标签" prop="tag">
+                    <el-select v-model="questionnaireModel.tag" placeholder="选择标签">
+                        <el-option value="智力">智力</el-option>
+                        <el-option value="情商">情商</el-option>
+                        <el-option value="职业">职业</el-option>
+                        <el-option value="个性">个性</el-option>
+                    </el-select>
+                </el-form-item>
+                <el-form-item label="区间1下限" prop="lowerlimit1">
+                    <el-input v-model="questionnaireModel.lowerlimit1"></el-input>
+                </el-form-item>
+                <el-form-item label="区间1上限" prop="upperlimit1">
+                    <el-input v-model="questionnaireModel.upperlimit1"></el-input>
+                </el-form-item>
+                <el-form-item label="区间1结论" prop="result1">
+                    <el-input v-model="questionnaireModel.result1" maxlength="120" show-word-limit></el-input>
+                </el-form-item>
+                <el-form-item label="区间2下限" prop="lowerlimit2">
+                    <el-input v-model="questionnaireModel.lowerlimit2"></el-input>
+                </el-form-item>
+                <el-form-item label="区间2上限" prop="upperlimit2">
+                    <el-input v-model="questionnaireModel.upperlimit2"></el-input>
+                </el-form-item>
+                <el-form-item label="区间2结论" prop="result2">
+                    <el-input v-model="questionnaireModel.result2" maxlength="120" show-word-limit></el-input>
+                </el-form-item>
+                <el-form-item label="区间3下限" prop="lowerlimit3">
+                    <el-input v-model="questionnaireModel.lowerlimit3"></el-input>
+                </el-form-item>
+                <el-form-item label="区间3上限" prop="upperlimit3">
+                    <el-input v-model="questionnaireModel.upperlimit3"></el-input>
+                </el-form-item>
+                <el-form-item label="区间3结论" prop="result3">
+                    <el-input v-model="questionnaireModel.result3" maxlength="120" show-word-limit></el-input>
+                </el-form-item>
+                <el-form-item label="区间4下限" prop="lowerlimit4">
+                    <el-input v-model="questionnaireModel.lowerlimit4"></el-input>
+                </el-form-item>
+                <el-form-item label="区间4上限" prop="upperlimit4">
+                    <el-input v-model="questionnaireModel.upperlimit4"></el-input>
+                </el-form-item>
+                <el-form-item label="区间4结论" prop="result4">
+                    <el-input v-model="questionnaireModel.result4" maxlength="120" show-word-limit></el-input>
+                </el-form-item>
+                <el-form-item label="区间5下限" prop="lowerlimit5">
+                    <el-input v-model="questionnaireModel.lowerlimit5"></el-input>
+                </el-form-item>
+                <el-form-item label="区间5上限" prop="upperlimit5">
+                    <el-input v-model="questionnaireModel.upperlimit5"></el-input>
+                </el-form-item>
+                <el-form-item label="区间5结论" prop="result5">
+                    <el-input v-model="questionnaireModel.result5" maxlength="120" show-word-limit></el-input>
                 </el-form-item>
             </el-form>
             <template #footer>
@@ -65,6 +123,7 @@ const questionnaire = ref([])
 const getQuestionnaireData = async () => {
     const questionnaireData = await getQuestionnaire(userInfoStore?.info?.organization)
     questionnaire.value = [...questionnaireData?.data]
+    // console.log(questionnaire.value);
 }
 
 getQuestionnaireData()
@@ -79,7 +138,23 @@ const dialogVisible = ref(false)
 const questionnaireModel = ref({
     name: '',
     description: '',
-    organization: userInfoStore?.info?.organization
+    organization: userInfoStore?.info?.organization,
+    tag: '',
+    lowerlimit1: '0',
+    upperlimit1: '50',
+    result1: '',
+    lowerlimit2: '51',
+    upperlimit2: '100',
+    result2: '',
+    lowerlimit3: '',
+    upperlimit3: '',
+    result3: '',
+    lowerlimit4: '',
+    upperlimit4: '',
+    result4: '',
+    lowerlimit5: '',
+    upperlimit5: '',
+    result5: '',
 })
 
 const checkQuestionnaireName = (rule, value, callback) => {
@@ -98,6 +173,29 @@ const checkQuestionnaireDescription = (rule, value, callback) => {
     }
 }
 
+const checkLimit = (rule,value,callback) => {
+    let str = /^\+?[1-9][0-9]*$/
+    if(!str.test(value) || value > 100) {
+        callback(new Error('边界必须为0~100的整数'))
+    } else callback()
+}
+
+const checkLimitNull = (rule,value,callback) => {
+    if(value === null || value === '') callback()
+    let str = /^\+?[1-9][0-9]*$/
+    if(!str.test(value) || value > 100) {
+        callback(new Error('边界必须为0~100的整数'))
+    } else callback()
+}
+
+const checkResult = (rule,value,callback) => {
+    if(value === '') {
+        callback(new Error('请输入结论'))
+    } else {
+        callback()
+    }
+}
+
 //添加问卷表单校验
 const rules = {
     name: [
@@ -105,7 +203,46 @@ const rules = {
     ],
     description: [
         { required: true, trigger: ['change','blur'], validator: checkQuestionnaireDescription },
-    ]
+    ],
+    tag: [
+    { required: true, trigger: ['change','blur'], message: '请选择标签' }
+    ],
+    lowerlimit1: [
+        { required: true, trigger: ['change','blur'], validator: checkLimit }
+    ],
+    upperlimit1: [
+        { required: true, trigger: ['change','blur'], validator: checkLimit }
+    ],
+    lowerlimit2: [
+        { required: true, trigger: ['change','blur'], validator: checkLimit }
+    ],
+    upperlimit2: [
+        { required: true, trigger: ['change','blur'], validator: checkLimit }
+    ],
+    result1: [
+        { required: true, trigger: ['change','blur'], validator: checkResult }
+    ],
+    result2: [
+        { required: true, trigger: ['change','blur'], validator: checkResult }
+    ],
+    lowerlimit3: [
+        { trigger: ['change','blur'], validator: checkLimitNull }
+    ],
+    upperlimit3: [
+        { trigger: ['change','blur'], validator: checkLimitNull }
+    ],
+    lowerlimit4: [
+        { trigger: ['change','blur'], validator: checkLimitNull }
+    ],
+    upperlimit4: [
+        { trigger: ['change','blur'], validator: checkLimitNull }
+    ],
+    lowerlimit5: [
+        { trigger: ['change','blur'], validator: checkLimitNull }
+    ],
+    upperlimit5: [
+        { trigger: ['change','blur'], validator: checkLimitNull }
+    ],
 }
 
 //调用接口,添加表单
@@ -118,6 +255,35 @@ const toAddQuestionnaire = async () => {
         ElMessage.error('请填写问卷介绍')
         return
     }
+    if(questionnaireModel.value.tag === '') {
+        ElMessage.error('请选择问卷标签')
+        return
+    }
+    if(questionnaireModel.value.lowerlimit3 !== '' && questionnaireModel.value.lowerlimit3 !== null && questionnaireModel.value.result3 === '') {
+        ElMessage.error('请填写结论3')
+        return
+    }
+    if(questionnaireModel.value.lowerlimit4 !== '' && questionnaireModel.value.lowerlimit4 !== null && questionnaireModel.value.result4 === '') {
+        ElMessage.error('请填写结论4')
+        return
+    }
+    if(questionnaireModel.value.lowerlimit5 !== '' && questionnaireModel.value.lowerlimit5 !== null && questionnaireModel.value.result5 === '') {
+        ElMessage.error('请填写结论5')
+        return
+    }
+    if(questionnaireModel.value.upperlimit1 < questionnaireModel.value.lowerlimit1 
+        || questionnaireModel.value.upperlimit2 < questionnaireModel.value.lowerlimit2
+        || questionnaireModel.value.upperlimit3 < questionnaireModel.value.lowerlimit3
+        || questionnaireModel.value.upperlimit4 < questionnaireModel.value.lowerlimit4
+        || questionnaireModel.value.upperlimit5 < questionnaireModel.value.lowerlimit5) {
+        ElMessage.error('区间上限不能小于下限')
+        return
+    }
+    if(true) {
+        ElMessage.error('总分区间阶梯有重叠部分')
+        return
+    }
+    return
     //调用接口
     await addQuestionnaire(questionnaireModel.value);
     ElMessage.success('添加成功')
@@ -134,6 +300,22 @@ const showDialog = (row) => {
     //数据拷贝
     questionnaireModel.value.name = row.name;
     questionnaireModel.value.description = row.description;
+    questionnaireModel.value.tag = row.tag
+    questionnaireModel.value.lowerlimit1 = row.lowerlimit1
+    questionnaireModel.value.upperlimit1 = row.upperlimit1
+    questionnaireModel.value.result1 = row.result1
+    questionnaireModel.value.lowerlimit2 = row.lowerlimit2
+    questionnaireModel.value.upperlimit2 = row.upperlimit2
+    questionnaireModel.value.result2 = row.result2
+    questionnaireModel.value.lowerlimit3 = row.lowerlimit3 || null
+    questionnaireModel.value.upperlimit3 = row.upperlimit3 || null
+    questionnaireModel.value.result3 = row.result3
+    questionnaireModel.value.lowerlimit4 = row.lowerlimit4 || null
+    questionnaireModel.value.upperlimit4 = row.upperlimit4 || null
+    questionnaireModel.value.result4 = row.result4
+    questionnaireModel.value.lowerlimit5 = row.lowerlimit5 || null
+    questionnaireModel.value.upperlimit5 = row.upperlimit5 || null
+    questionnaireModel.value.result5 = row.result5
     //扩展id属性,将来需要传递给后台,完成问卷的修改
     questionnaireModel.value.id = row.id
 }
@@ -155,7 +337,23 @@ const clearData = () => {
     questionnaireModel.value = {
         name: '',
         description: '',
-        organization: userInfoStore?.info?.organization
+        organization: userInfoStore?.info?.organization,
+        tag: '',
+        lowerlimit1: 0,
+        upperlimit1: 50,
+        result1: '',
+        lowerlimit2: 51,
+        upperlimit2: 100,
+        result2: '',
+        lowerlimit3: null,
+        upperlimit3: null,
+        result3: '',
+        lowerlimit4: null,
+        upperlimit4: null,
+        result4: '',
+        lowerlimit5: null,
+        upperlimit5: null,
+        result5: '',
     }
 }
 
