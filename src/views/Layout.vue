@@ -13,11 +13,11 @@
                     </el-icon>
                     <span>测评问卷</span>
                 </el-menu-item>
-                <el-menu-item index="/questionnaire/overview">
+                <el-menu-item index="/record/overview">
                     <el-icon>
                         <Promotion />
                     </el-icon>
-                    <span>管理</span>
+                    <span>测评记录</span>
                 </el-menu-item>
                 <el-sub-menu >
                     <template #title>

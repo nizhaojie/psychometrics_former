@@ -12,7 +12,7 @@
             <!-- <el-table-column label="序号" width="70" prop="id"> </el-table-column> -->
             <el-table-column label="问卷名称" prop="name" width="250">
                 <template #default="scope">
-                    <div class="clickable" @click="openQuestionnaire(scope?.row?.id,scope?.row?.name)">{{ scope?.row?.name }}</div>
+                    <div class="clickable" @click="openQuestionnaire(scope?.row)">{{ scope?.row?.name }}</div>
                 </template>
             </el-table-column>
             <el-table-column label="问卷介绍" prop="description"></el-table-column>
@@ -50,46 +50,46 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="区间1下限" prop="lowerlimit1">
-                    <el-input v-model="questionnaireModel.lowerlimit1"></el-input>
+                    <el-input v-model.number="questionnaireModel.lowerlimit1" type="number"></el-input>
                 </el-form-item>
                 <el-form-item label="区间1上限" prop="upperlimit1">
-                    <el-input v-model="questionnaireModel.upperlimit1"></el-input>
+                    <el-input v-model.number="questionnaireModel.upperlimit1" type="number"></el-input>
                 </el-form-item>
                 <el-form-item label="区间1结论" prop="result1">
                     <el-input v-model="questionnaireModel.result1" maxlength="120" show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="区间2下限" prop="lowerlimit2">
-                    <el-input v-model="questionnaireModel.lowerlimit2"></el-input>
+                    <el-input v-model.number="questionnaireModel.lowerlimit2" type="number"></el-input>
                 </el-form-item>
                 <el-form-item label="区间2上限" prop="upperlimit2">
-                    <el-input v-model="questionnaireModel.upperlimit2"></el-input>
+                    <el-input v-model.number="questionnaireModel.upperlimit2" type="number"></el-input>
                 </el-form-item>
                 <el-form-item label="区间2结论" prop="result2">
                     <el-input v-model="questionnaireModel.result2" maxlength="120" show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="区间3下限" prop="lowerlimit3">
-                    <el-input v-model="questionnaireModel.lowerlimit3"></el-input>
+                    <el-input v-model.number="questionnaireModel.lowerlimit3" type="number"></el-input>
                 </el-form-item>
                 <el-form-item label="区间3上限" prop="upperlimit3">
-                    <el-input v-model="questionnaireModel.upperlimit3"></el-input>
+                    <el-input v-model.number="questionnaireModel.upperlimit3" type="number"></el-input>
                 </el-form-item>
                 <el-form-item label="区间3结论" prop="result3">
                     <el-input v-model="questionnaireModel.result3" maxlength="120" show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="区间4下限" prop="lowerlimit4">
-                    <el-input v-model="questionnaireModel.lowerlimit4"></el-input>
+                    <el-input v-model.number="questionnaireModel.lowerlimit4" type="number"></el-input>
                 </el-form-item>
                 <el-form-item label="区间4上限" prop="upperlimit4">
-                    <el-input v-model="questionnaireModel.upperlimit4"></el-input>
+                    <el-input v-model.number="questionnaireModel.upperlimit4" type="number"></el-input>
                 </el-form-item>
                 <el-form-item label="区间4结论" prop="result4">
                     <el-input v-model="questionnaireModel.result4" maxlength="120" show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="区间5下限" prop="lowerlimit5">
-                    <el-input v-model="questionnaireModel.lowerlimit5"></el-input>
+                    <el-input v-model.number="questionnaireModel.lowerlimit5" type="number"></el-input>
                 </el-form-item>
                 <el-form-item label="区间5上限" prop="upperlimit5">
-                    <el-input v-model="questionnaireModel.upperlimit5"></el-input>
+                    <el-input v-model.number="questionnaireModel.upperlimit5" type="number"></el-input>
                 </el-form-item>
                 <el-form-item label="区间5结论" prop="result5">
                     <el-input v-model="questionnaireModel.result5" maxlength="120" show-word-limit></el-input>
@@ -130,7 +130,6 @@ getQuestionnaireData()
 
 //定义变量,控制标题的展示
 const title = ref('')
-
 //控制添加问卷弹窗
 const dialogVisible = ref(false)
 
@@ -140,20 +139,20 @@ const questionnaireModel = ref({
     description: '',
     organization: userInfoStore?.info?.organization,
     tag: '',
-    lowerlimit1: '0',
-    upperlimit1: '50',
+    lowerlimit1: 0,
+    upperlimit1: 50,
     result1: '',
-    lowerlimit2: '51',
-    upperlimit2: '100',
+    lowerlimit2: 51,
+    upperlimit2: 100,
     result2: '',
-    lowerlimit3: '',
-    upperlimit3: '',
+    lowerlimit3: null,
+    upperlimit3: null,
     result3: '',
-    lowerlimit4: '',
-    upperlimit4: '',
+    lowerlimit4: null,
+    upperlimit4: null,
     result4: '',
-    lowerlimit5: '',
-    upperlimit5: '',
+    lowerlimit5: null,
+    upperlimit5: null,
     result5: '',
 })
 
@@ -174,7 +173,7 @@ const checkQuestionnaireDescription = (rule, value, callback) => {
 }
 
 const checkLimit = (rule,value,callback) => {
-    let str = /^\+?[1-9][0-9]*$/
+    let str = /^([0-9]{1,2}|100)$/
     if(!str.test(value) || value > 100) {
         callback(new Error('边界必须为0~100的整数'))
     } else callback()
@@ -182,7 +181,7 @@ const checkLimit = (rule,value,callback) => {
 
 const checkLimitNull = (rule,value,callback) => {
     if(value === null || value === '') callback()
-    let str = /^\+?[1-9][0-9]*$/
+    let str = /^([0-9]{1,2}|100)$/
     if(!str.test(value) || value > 100) {
         callback(new Error('边界必须为0~100的整数'))
     } else callback()
@@ -245,53 +244,84 @@ const rules = {
     ],
 }
 
+const checkquestionnaireModel = (questionnaireModel) => {
+    if(questionnaireModel.name.trim() === '') {
+        ElMessage.error('请填写问卷名称')
+        return false
+    }
+    if(questionnaireModel.description.trim() === '') {
+        ElMessage.error('请填写问卷介绍')
+        return false
+    }
+    if(questionnaireModel.tag === '') {
+        ElMessage.error('请选择问卷标签')
+        return false
+    }
+    if(questionnaireModel.result1.trim() === '') {
+        ElMessage.error('请填写结论1')
+        return false
+    }
+    if(questionnaireModel.result2.trim() === '') {
+        ElMessage.error('请填写结论2')
+        return false
+    }
+    let limits = [questionnaireModel.lowerlimit1,
+                questionnaireModel.upperlimit1,
+                questionnaireModel.lowerlimit2,
+                questionnaireModel.upperlimit2,
+    ]
+    let s1 = ''
+    let s2 = ''
+    let s3 = ''
+    for(let i = 3; i < 6; i++) {
+        s1 = 'lowerlimit' + i
+        s2 = 'upperlimit' + i
+        s3 = 'result' + i
+        if(questionnaireModel[s1] || questionnaireModel[s2] || questionnaireModel[s3].trim()) {
+            if(questionnaireModel[s1] && questionnaireModel[s2] && questionnaireModel[s3].trim()) {
+                limits.push(questionnaireModel[s1])
+                limits.push(questionnaireModel[s2])
+            } else {
+                ElMessage.error('区间' + i + '的上下限或结论有缺少')
+                return false
+            }
+        }
+    }
+    for(let i = 0; i < limits.length; i++) {
+        if(limits[i] < 0 || limits[i] > 100 || Math.floor(limits[i]) !== limits[i]) {
+            ElMessage.error('边界必须为0~100的整数')
+            return false
+        }
+        if(limits[0] !== 0 || limits[limits.length-1] !== 100) {
+            ElMessage.error('上下边界必须为100和0')
+            return false
+        }
+        if(i > 0) {
+            if(i%2 === 1 && limits[i] < limits[i-1]) {
+                ElMessage.error('区间上限必须大于下限')
+                return false
+            } else if(i%2 === 0 && limits[i] !== limits[i-1]+1) {
+                ElMessage.error('不同区间之间不能有空隙')
+                return false
+            }
+        }
+    }
+    return true
+}
+
 //调用接口,添加表单
 const toAddQuestionnaire = async () => {
-    if(questionnaireModel.value.name.trim() === '') {
-        ElMessage.error('请填写问卷名称')
-        return
-    }
-    if(questionnaireModel.value.description.trim() === '') {
-        ElMessage.error('请填写问卷介绍')
-        return
-    }
-    if(questionnaireModel.value.tag === '') {
-        ElMessage.error('请选择问卷标签')
-        return
-    }
-    if(questionnaireModel.value.lowerlimit3 !== '' && questionnaireModel.value.lowerlimit3 !== null && questionnaireModel.value.result3 === '') {
-        ElMessage.error('请填写结论3')
-        return
-    }
-    if(questionnaireModel.value.lowerlimit4 !== '' && questionnaireModel.value.lowerlimit4 !== null && questionnaireModel.value.result4 === '') {
-        ElMessage.error('请填写结论4')
-        return
-    }
-    if(questionnaireModel.value.lowerlimit5 !== '' && questionnaireModel.value.lowerlimit5 !== null && questionnaireModel.value.result5 === '') {
-        ElMessage.error('请填写结论5')
-        return
-    }
-    if(questionnaireModel.value.upperlimit1 < questionnaireModel.value.lowerlimit1 
-        || questionnaireModel.value.upperlimit2 < questionnaireModel.value.lowerlimit2
-        || questionnaireModel.value.upperlimit3 < questionnaireModel.value.lowerlimit3
-        || questionnaireModel.value.upperlimit4 < questionnaireModel.value.lowerlimit4
-        || questionnaireModel.value.upperlimit5 < questionnaireModel.value.lowerlimit5) {
-        ElMessage.error('区间上限不能小于下限')
-        return
-    }
-    if(true) {
-        ElMessage.error('总分区间阶梯有重叠部分')
-        return
-    }
-    return
-    //调用接口
-    await addQuestionnaire(questionnaireModel.value);
-    ElMessage.success('添加成功')
+    let res = checkquestionnaireModel(questionnaireModel.value)
+    if(res) {
+        //调用接口
+        await addQuestionnaire(questionnaireModel.value);
+        ElMessage.success('添加成功')
 
-    //调用获取所有文章问卷的函数
-    getQuestionnaireData();
-    dialogVisible.value = false;
-    clearData()
+        //调用获取所有文章问卷的函数
+        getQuestionnaireData();
+        dialogVisible.value = false;
+        clearData()
+    }
 }
 
 //展示编辑弹窗
@@ -301,35 +331,34 @@ const showDialog = (row) => {
     questionnaireModel.value.name = row.name;
     questionnaireModel.value.description = row.description;
     questionnaireModel.value.tag = row.tag
-    questionnaireModel.value.lowerlimit1 = row.lowerlimit1
-    questionnaireModel.value.upperlimit1 = row.upperlimit1
-    questionnaireModel.value.result1 = row.result1
-    questionnaireModel.value.lowerlimit2 = row.lowerlimit2
-    questionnaireModel.value.upperlimit2 = row.upperlimit2
-    questionnaireModel.value.result2 = row.result2
-    questionnaireModel.value.lowerlimit3 = row.lowerlimit3 || null
-    questionnaireModel.value.upperlimit3 = row.upperlimit3 || null
-    questionnaireModel.value.result3 = row.result3
-    questionnaireModel.value.lowerlimit4 = row.lowerlimit4 || null
-    questionnaireModel.value.upperlimit4 = row.upperlimit4 || null
-    questionnaireModel.value.result4 = row.result4
-    questionnaireModel.value.lowerlimit5 = row.lowerlimit5 || null
-    questionnaireModel.value.upperlimit5 = row.upperlimit5 || null
-    questionnaireModel.value.result5 = row.result5
+    let s1 = ''
+    let s2 = ''
+    let s3 = ''
+    for(let i = 1; i < 6; i++) {
+        s1 = 'lowerlimit' + i
+        s2 = 'upperlimit' + i
+        s3 = 'result' + i
+        questionnaireModel.value[s1] = i < 3 ? row[s1] : row[s1] || null
+        questionnaireModel.value[s2] = i < 3 ? row[s2] : row[s2] || null
+        questionnaireModel.value[s3] = row[s3]
+    }
     //扩展id属性,将来需要传递给后台,完成问卷的修改
     questionnaireModel.value.id = row.id
 }
 
 //编辑问卷
 const toUpdateQuestionnaire = async () => {
-    //调用接口
-    await updateQuestionnaire(questionnaireModel.value);
-    ElMessage.success('修改成功')
-    //调用获取所有问卷的函数
-    getQuestionnaireData();
-    //隐藏弹窗
-    dialogVisible.value = false;
-    clearData()
+    let res = checkquestionnaireModel(questionnaireModel.value)
+    if(res) {
+        //调用接口
+        await updateQuestionnaire(questionnaireModel.value);
+        ElMessage.success('修改成功')
+        //调用获取所有问卷的函数
+        getQuestionnaireData();
+        //隐藏弹窗
+        dialogVisible.value = false;
+        clearData()
+    }
 }
 
 //清空模型的数据
@@ -387,12 +416,27 @@ const toDeleteQuestionnaire = (row) => {
         })
 }
 
-const openQuestionnaire = (questionnaireId,questionnaireName) => {
+const openQuestionnaire = (questionnaireModel) => {
     router.push({
         path: '/questionnaire/info',
         query: {
-            questionnaireId: questionnaireId,
-            questionnaireName: questionnaireName
+            questionnaireId: questionnaireModel.id,
+            questionnaireName: questionnaireModel.name,
+            lowerlimit1: questionnaireModel.lowerlimit1,
+            upperlimit1: questionnaireModel.upperlimit1,
+            lowerlimit2: questionnaireModel.lowerlimit2,
+            upperlimit2: questionnaireModel.upperlimit2,
+            lowerlimit3: questionnaireModel.lowerlimit3 || 100,
+            upperlimit3: questionnaireModel.upperlimit3,
+            lowerlimit4: questionnaireModel.lowerlimit4 || 100,
+            upperlimit4: questionnaireModel.upperlimit4,
+            lowerlimit5: questionnaireModel.lowerlimit5 || 100,
+            upperlimit5: questionnaireModel.upperlimit5,
+            result1: questionnaireModel.result1,
+            result2: questionnaireModel.result2,
+            result3: questionnaireModel.result3,
+            result4: questionnaireModel.result4,
+            result5: questionnaireModel.result5
         }
     })
 }

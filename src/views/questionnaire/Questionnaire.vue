@@ -38,16 +38,20 @@
 <script setup>
 import { ref, computed } from 'vue'
 import { getQuestions, addQuestion, updateQuestion, deleteQuestion } from '@/api/questionnaire.js'
+import { addRecord } from '@/api/record.js'
 import { ElMessage, ElMessageBox, ElText, ElRadio, ElProgress, ElPagination } from 'element-plus'
 import { useRouter } from 'vue-router'
 const router = useRouter();
 import useUserInfoStore from '@/stores/userInfo.js'
+const userInfoStore = useUserInfoStore();
 
 // 问卷id和问卷名称
 const questionnaireId = ref(0)
 const questionnaireName = ref('')
 questionnaireId.value = router?.currentRoute?._rawValue?.query?.questionnaireId
 questionnaireName.value = router?.currentRoute?._rawValue?.query?.questionnaireName
+
+
 // 所有题目数据
 const questionData = ref([])
 
@@ -86,7 +90,7 @@ const changeAnswer = (answer) => {
 const toGetQuestions = async (questionnaireId) => {
     const result = await getQuestions(questionnaireId)
     questionData.value = result?.data
-    console.log(questionData.value);
+    // console.log('questionData',questionData.value);
     changeQuestion(0)
 }
 toGetQuestions(questionnaireId.value)
@@ -119,7 +123,55 @@ const backToOverview = () => {
 
 // 提交问卷
 const submitQuestionnaire = () => {
+  let score = 0
+  let answer = 0
+  let s = ''
+  let s1 = ''
+  let s2 = ''
+  let s3 = ''
+  for(let i = 0; i < questionData.value.length; i++) {
+    answer = answers.get(questionData.value[i].id)
+    s = 'score' + answer
+    score += questionData.value[i][s]
+  }
+  for(let i = 1; i < 6; i++) {
+    s1 = 'lowerlimit' + i
+    s2 = 'upperlimit' + i
+    s3 = 'result' + i
+    if(score > router?.currentRoute?._rawValue?.query[s1] && score < router?.currentRoute?._rawValue?.query[s2]) {
+      let res = router?.currentRoute?._rawValue?.query[s3]
+      // 添加记录
+      toAddRecord(score,res)
+      // 切换到结论界面
+      router.push({
+        path: '/record/detail',
+        query: {
+          score: score,
+          result: res
+        }
+      })
+      return
+    }
+  }
+}
 
+// 添加记录
+const toAddRecord = (score,res) => {
+  let now = new Date();
+  let year = now.getFullYear();
+  let month = ('0' + (now.getMonth() + 1)).slice(-2);
+  let day = ('0' + now.getDate()).slice(-2);
+  let hours = ('0' + now.getHours()).slice(-2);
+  let minutes = ('0' + now.getMinutes()).slice(-2);
+  let record = {
+    userId: userInfoStore?.info?.id,
+    questionnaireName: questionnaireName.value,
+    time: year + '/' + month + '/' + day + '/ ' + hours + ':' + minutes,
+    score: score,
+    report: res
+  }
+  // console.log('record',record);
+  addRecord(record)
 }
 </script>
 

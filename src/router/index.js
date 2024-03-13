@@ -6,6 +6,8 @@ import LayoutVue from '@/views/Layout.vue'
 
 import QuestionnaireOverview from '@/views/questionnaire/QuestionnaireOverview.vue'
 import Questionnaire from '@/views/questionnaire/Questionnaire.vue'
+import RecordDetail from '@/views/record/RecordDetail.vue'
+import RecordOverview from '@/views/record/RecordOverview.vue'
 import UserAvatarVue from '@/views/user/UserAvatar.vue'
 import UserInfoVue from '@/views/user/UserInfo.vue'
 import UserResetPasswordVue from '@/views/user/UserResetPassword.vue'
@@ -17,11 +19,13 @@ const routes = [
         path: '/', component: LayoutVue,redirect:'/questionnaire/overview', children: [
             { path: '/questionnaire/overview', component: QuestionnaireOverview },
             { path: '/questionnaire/info', component: Questionnaire },
+            { path: '/record/detail', component: RecordDetail },
+            { path: '/record/overview', component: RecordOverview },
             { path: '/user/info', component: UserInfoVue },
             { path: '/user/avatar', component: UserAvatarVue },
-            { path: '/user/resetPassword', component: UserResetPasswordVue }
+            { path: '/user/resetPassword', component: UserResetPasswordVue },
         ]
-    }
+    },
 ]
 
 //创建路由器
