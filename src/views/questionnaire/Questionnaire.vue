@@ -36,10 +36,10 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
-import { getQuestions, addQuestion, updateQuestion, deleteQuestion } from '@/api/questionnaire.js'
+import { ref } from 'vue'
+import { getQuestions } from '@/api/questionnaire.js'
 import { addRecord } from '@/api/record.js'
-import { ElMessage, ElMessageBox, ElText, ElRadio, ElProgress, ElPagination } from 'element-plus'
+import { ElRadio, ElProgress, ElPagination } from 'element-plus'
 import { useRouter } from 'vue-router'
 const router = useRouter();
 import useUserInfoStore from '@/stores/userInfo.js'

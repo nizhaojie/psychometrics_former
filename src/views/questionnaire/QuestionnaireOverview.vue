@@ -2,8 +2,8 @@
     <el-card class="page-container">
         <template #header>
             <div class="header">
-                <span>测评问卷</span>
-                <div class="extra">
+                <span class="title">测评问卷</span>
+                <div class="extra" v-if="administrator">
                     <el-button type="primary" @click="dialogVisible = true; title = '添加问卷';">添加问卷</el-button>
                 </div>
             </div>
@@ -21,7 +21,7 @@
                     <el-tag size="large" :type="scope?.row?.tag==='智力'?'success':(scope?.row?.tag==='情商'?'primary':(scope?.row?.tag==='职业'?'warning':'danger'))">{{ scope?.row?.tag }}</el-tag>
                 </template>
             </el-table-column>
-            <el-table-column label="操作" width="120">
+            <el-table-column label="操作" width="120" v-if="administrator">
                 <template #default="{ row }">
                     <el-button :icon="Edit" circle plain type="primary" @click="showDialog(row)"></el-button>
                     <el-button :icon="Delete" circle plain type="danger" @click="toDeleteQuestionnaire(row)"></el-button>
@@ -50,46 +50,46 @@
                     </el-select>
                 </el-form-item>
                 <el-form-item label="区间1下限" prop="lowerlimit1">
-                    <el-input v-model.number="questionnaireModel.lowerlimit1" type="number"></el-input>
+                    <el-input-number v-model="questionnaireModel.lowerlimit1" :min="0" :max="100" :precision="0"></el-input-number>
                 </el-form-item>
                 <el-form-item label="区间1上限" prop="upperlimit1">
-                    <el-input v-model.number="questionnaireModel.upperlimit1" type="number"></el-input>
+                    <el-input-number v-model="questionnaireModel.upperlimit1" :min="0" :max="100" :precision="0"></el-input-number>
                 </el-form-item>
                 <el-form-item label="区间1结论" prop="result1">
                     <el-input v-model="questionnaireModel.result1" maxlength="120" show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="区间2下限" prop="lowerlimit2">
-                    <el-input v-model.number="questionnaireModel.lowerlimit2" type="number"></el-input>
+                    <el-input-number v-model="questionnaireModel.lowerlimit2" :min="0" :max="100" :precision="0"></el-input-number>
                 </el-form-item>
                 <el-form-item label="区间2上限" prop="upperlimit2">
-                    <el-input v-model.number="questionnaireModel.upperlimit2" type="number"></el-input>
+                    <el-input-number v-model="questionnaireModel.upperlimit2" :min="0" :max="100" :precision="0"></el-input-number>
                 </el-form-item>
                 <el-form-item label="区间2结论" prop="result2">
                     <el-input v-model="questionnaireModel.result2" maxlength="120" show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="区间3下限" prop="lowerlimit3">
-                    <el-input v-model.number="questionnaireModel.lowerlimit3" type="number"></el-input>
+                    <el-input-number v-model="questionnaireModel.lowerlimit3" :min="0" :max="100" :precision="0"></el-input-number>
                 </el-form-item>
                 <el-form-item label="区间3上限" prop="upperlimit3">
-                    <el-input v-model.number="questionnaireModel.upperlimit3" type="number"></el-input>
+                    <el-input-number v-model="questionnaireModel.upperlimit3" :min="0" :max="100" :precision="0"></el-input-number>
                 </el-form-item>
                 <el-form-item label="区间3结论" prop="result3">
                     <el-input v-model="questionnaireModel.result3" maxlength="120" show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="区间4下限" prop="lowerlimit4">
-                    <el-input v-model.number="questionnaireModel.lowerlimit4" type="number"></el-input>
+                    <el-input-number v-model="questionnaireModel.lowerlimit4" :min="0" :max="100" :precision="0"></el-input-number>
                 </el-form-item>
                 <el-form-item label="区间4上限" prop="upperlimit4">
-                    <el-input v-model.number="questionnaireModel.upperlimit4" type="number"></el-input>
+                    <el-input-number v-model="questionnaireModel.upperlimit4" :min="0" :max="100" :precision="0"></el-input-number>
                 </el-form-item>
                 <el-form-item label="区间4结论" prop="result4">
                     <el-input v-model="questionnaireModel.result4" maxlength="120" show-word-limit></el-input>
                 </el-form-item>
                 <el-form-item label="区间5下限" prop="lowerlimit5">
-                    <el-input v-model.number="questionnaireModel.lowerlimit5" type="number"></el-input>
+                    <el-input-number v-model="questionnaireModel.lowerlimit5" :min="0" :max="100" :precision="0"></el-input-number>
                 </el-form-item>
                 <el-form-item label="区间5上限" prop="upperlimit5">
-                    <el-input v-model.number="questionnaireModel.upperlimit5" type="number"></el-input>
+                    <el-input-number v-model="questionnaireModel.upperlimit5" :min="0" :max="100" :precision="0"></el-input-number>
                 </el-form-item>
                 <el-form-item label="区间5结论" prop="result5">
                     <el-input v-model="questionnaireModel.result5" maxlength="120" show-word-limit></el-input>
@@ -114,19 +114,36 @@ import { ref } from 'vue'
 import { getQuestionnaire, addQuestionnaire, updateQuestionnaire, deleteQuestionnaire } from '@/api/questionnaire.js'
 import { ElMessage, ElMessageBox } from 'element-plus'
 import { useRouter } from 'vue-router'
-const router = useRouter();
+import { userInfoService } from '@/api/user.js'
 import useUserInfoStore from '@/stores/userInfo.js'
 const userInfoStore = useUserInfoStore();
+const router = useRouter();
+// 问卷数据
 const questionnaire = ref([])
+// 是否为管理员的标志
+const administrator = ref(false)
 
-// 根据组织获取对应的问卷数据
-const getQuestionnaireData = async () => {
-    const questionnaireData = await getQuestionnaire(userInfoStore?.info?.organization)
-    questionnaire.value = [...questionnaireData?.data]
-    // console.log(questionnaire.value);
+//调用函数,获取用户详细信息
+const getUserInfo = async () => {
+    //调用接口
+    let result = await userInfoService();
+    //数据存储到pinia中
+    userInfoStore.setInfo(result.data);
+    // 获取问卷信息
+    getQuestionnaireData()
 }
 
-getQuestionnaireData()
+// 初始化,获取问卷数据和是否为管理员
+const getQuestionnaireData = async () => {
+    const questionnaireData = await getQuestionnaire(userInfoStore?.info?.organization)
+    administrator.value = userInfoStore?.info?.administrator === 1 ? true : false
+    questionnaire.value = [...questionnaireData?.data]
+}
+
+// 如果已经有了用户数据就只要获取问卷数据就可以了
+if(!userInfoStore?.info?.organization) {
+    getUserInfo()
+} else getQuestionnaireData()
 
 //定义变量,控制标题的展示
 const title = ref('')
@@ -288,10 +305,6 @@ const checkquestionnaireModel = (questionnaireModel) => {
         }
     }
     for(let i = 0; i < limits.length; i++) {
-        if(limits[i] < 0 || limits[i] > 100 || Math.floor(limits[i]) !== limits[i]) {
-            ElMessage.error('边界必须为0~100的整数')
-            return false
-        }
         if(limits[0] !== 0 || limits[limits.length-1] !== 100) {
             ElMessage.error('上下边界必须为100和0')
             return false
@@ -417,6 +430,12 @@ const toDeleteQuestionnaire = (row) => {
 }
 
 const openQuestionnaire = (questionnaireModel) => {
+    if(administrator.value) {
+        openQuestionnaireByAdministrator(questionnaireModel)
+    } else openQuestionnaireByUser(questionnaireModel)
+}
+
+const openQuestionnaireByUser = (questionnaireModel) => {
     router.push({
         path: '/questionnaire/info',
         query: {
@@ -441,6 +460,16 @@ const openQuestionnaire = (questionnaireModel) => {
     })
 }
 
+const openQuestionnaireByAdministrator = (questionnaireModel) => {
+    router.push({
+        path: '/questionnaire/update',
+        query: {
+            questionnaireId: questionnaireModel.id,
+            questionnaireName: questionnaireModel.name
+        }
+    })
+}
+
 </script>
 
 
@@ -453,6 +482,11 @@ const openQuestionnaire = (questionnaireModel) => {
         display: flex;
         align-items: center;
         justify-content: space-between;
+        
+        .title {
+        font-size: large;
+        font-weight: 600;
+    }
     }
 
 

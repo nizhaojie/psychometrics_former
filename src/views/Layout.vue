@@ -9,13 +9,13 @@
                 router>
                 <el-menu-item index="/questionnaire/overview">
                     <el-icon>
-                        <Management />
+                        <Promotion />
                     </el-icon>
                     <span>测评问卷</span>
                 </el-menu-item>
                 <el-menu-item index="/record/overview">
                     <el-icon>
-                        <Promotion />
+                        <List />
                     </el-icon>
                     <span>测评记录</span>
                 </el-menu-item>

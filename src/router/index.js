@@ -1,29 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router'
 
-//导入组件
-import LoginVue from '@/views/Login.vue'
-import LayoutVue from '@/views/Layout.vue'
-
-import QuestionnaireOverview from '@/views/questionnaire/QuestionnaireOverview.vue'
-import Questionnaire from '@/views/questionnaire/Questionnaire.vue'
-import RecordDetail from '@/views/record/RecordDetail.vue'
-import RecordOverview from '@/views/record/RecordOverview.vue'
-import UserAvatarVue from '@/views/user/UserAvatar.vue'
-import UserInfoVue from '@/views/user/UserInfo.vue'
-import UserResetPasswordVue from '@/views/user/UserResetPassword.vue'
-
 //定义路由关系
 const routes = [
-    { path: '/login', component: LoginVue },
+    { path: '/login', component: () => import("@/views/Login.vue") },
     {
-        path: '/', component: LayoutVue,redirect:'/questionnaire/overview', children: [
-            { path: '/questionnaire/overview', component: QuestionnaireOverview },
-            { path: '/questionnaire/info', component: Questionnaire },
-            { path: '/record/detail', component: RecordDetail },
-            { path: '/record/overview', component: RecordOverview },
-            { path: '/user/info', component: UserInfoVue },
-            { path: '/user/avatar', component: UserAvatarVue },
-            { path: '/user/resetPassword', component: UserResetPasswordVue },
+        path: '/', component: () => import("@/views/Layout.vue"), redirect:'/questionnaire/overview', children: [
+            { path: '/questionnaire/overview', component: import("@/views/questionnaire/QuestionnaireOverview.vue") },
+            { path: '/questionnaire/info', component: import("@/views/questionnaire/Questionnaire.vue") },
+            { path: '/questionnaire/update', component: import("@/views/questionnaire/QuestionnaireUpdate.vue") },
+            { path: '/record/detail', component: import("@/views/record/RecordDetail.vue") },
+            { path: '/record/overview', component: () => import("@/views/record/RecordOverview.vue") },
+            { path: '/user/info', component: () => import("@/views/user/UserInfo.vue") },
+            { path: '/user/avatar', component: () => import("@/views/user/UserAvatar.vue") },
+            { path: '/user/resetPassword', component: () => import("@/views/user/UserResetPassword.vue") },
         ]
     },
 ]
