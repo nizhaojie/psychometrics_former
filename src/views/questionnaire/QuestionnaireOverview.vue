@@ -189,20 +189,20 @@ const checkQuestionnaireDescription = (rule, value, callback) => {
     }
 }
 
-const checkLimit = (rule,value,callback) => {
-    let str = /^([0-9]{1,2}|100)$/
-    if(!str.test(value) || value > 100) {
-        callback(new Error('边界必须为0~100的整数'))
-    } else callback()
-}
+// const checkLimit = (rule,value,callback) => {
+//     let str = /^([0-9]{1,2}|100)$/
+//     if(!str.test(value) || value > 100) {
+//         callback(new Error('边界必须为0~100的整数'))
+//     } else callback()
+// }
 
-const checkLimitNull = (rule,value,callback) => {
-    if(value === null || value === '') callback()
-    let str = /^([0-9]{1,2}|100)$/
-    if(!str.test(value) || value > 100) {
-        callback(new Error('边界必须为0~100的整数'))
-    } else callback()
-}
+// const checkLimitNull = (rule,value,callback) => {
+//     if(value === null || value === '') callback()
+//     let str = /^([0-9]{1,2}|100)$/
+//     if(!str.test(value) || value > 100) {
+//         callback(new Error('边界必须为0~100的整数'))
+//     } else callback()
+// }
 
 const checkResult = (rule,value,callback) => {
     if(value === '') {
@@ -221,43 +221,25 @@ const rules = {
         { required: true, trigger: ['change','blur'], validator: checkQuestionnaireDescription },
     ],
     tag: [
-    { required: true, trigger: ['change','blur'], message: '请选择标签' }
+        { required: true, trigger: ['change','blur'], message: '请选择标签' }
     ],
     lowerlimit1: [
-        { required: true, trigger: ['change','blur'], validator: checkLimit }
+        { required: true, message: '请输入区间1下限' }
     ],
     upperlimit1: [
-        { required: true, trigger: ['change','blur'], validator: checkLimit }
+        { required: true, message: '请输入区间1上限' }
     ],
     lowerlimit2: [
-        { required: true, trigger: ['change','blur'], validator: checkLimit }
+        { required: true, message: '请输入区间2下限' }
     ],
     upperlimit2: [
-        { required: true, trigger: ['change','blur'], validator: checkLimit }
+        { required: true, message: '请输入区间2上限' }
     ],
     result1: [
         { required: true, trigger: ['change','blur'], validator: checkResult }
     ],
     result2: [
         { required: true, trigger: ['change','blur'], validator: checkResult }
-    ],
-    lowerlimit3: [
-        { trigger: ['change','blur'], validator: checkLimitNull }
-    ],
-    upperlimit3: [
-        { trigger: ['change','blur'], validator: checkLimitNull }
-    ],
-    lowerlimit4: [
-        { trigger: ['change','blur'], validator: checkLimitNull }
-    ],
-    upperlimit4: [
-        { trigger: ['change','blur'], validator: checkLimitNull }
-    ],
-    lowerlimit5: [
-        { trigger: ['change','blur'], validator: checkLimitNull }
-    ],
-    upperlimit5: [
-        { trigger: ['change','blur'], validator: checkLimitNull }
     ],
 }
 
@@ -282,6 +264,11 @@ const checkquestionnaireModel = (questionnaireModel) => {
         ElMessage.error('请填写结论2')
         return false
     }
+    // 确保前两个区间的边界都不为null
+    if(questionnaireModel.lowerlimit1 === null || questionnaireModel.upperlimit1 === null || questionnaireModel.lowerlimit2 === null || questionnaireModel.upperlimit2 === null) {
+        ElMessage.error('边界必须是0~100的整数')
+        return false
+    }
     let limits = [questionnaireModel.lowerlimit1,
                 questionnaireModel.upperlimit1,
                 questionnaireModel.lowerlimit2,
@@ -290,6 +277,7 @@ const checkquestionnaireModel = (questionnaireModel) => {
     let s1 = ''
     let s2 = ''
     let s3 = ''
+    // 检查后三个区间的三个属性是否有缺漏
     for(let i = 3; i < 6; i++) {
         s1 = 'lowerlimit' + i
         s2 = 'upperlimit' + i
@@ -304,19 +292,18 @@ const checkquestionnaireModel = (questionnaireModel) => {
             }
         }
     }
-    for(let i = 0; i < limits.length; i++) {
-        if(limits[0] !== 0 || limits[limits.length-1] !== 100) {
-            ElMessage.error('上下边界必须为100和0')
+    // 检查上下边界是否为0和100
+    if(limits[0] !== 0 || limits[limits.length-1] !== 100) {
+        ElMessage.error('上下边界必须为100和0')
+        return false
+    }
+    for(let i = 1; i < limits.length; i++) {
+        if(i%2 === 1 && limits[i] < limits[i-1]) {
+            ElMessage.error('区间上限必须大于下限')
             return false
-        }
-        if(i > 0) {
-            if(i%2 === 1 && limits[i] < limits[i-1]) {
-                ElMessage.error('区间上限必须大于下限')
-                return false
-            } else if(i%2 === 0 && limits[i] !== limits[i-1]+1) {
-                ElMessage.error('不同区间之间不能有空隙')
-                return false
-            }
+        } else if(i%2 === 0 && limits[i] !== limits[i-1]+1) {
+            ElMessage.error('不同区间之间不能有空隙')
+            return false
         }
     }
     return true
