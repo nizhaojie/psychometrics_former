@@ -36,10 +36,10 @@
         <el-dialog v-model="dialogVisible" :title="title" width="80%">
             <el-form :model="questionnaireModel" :rules="rules" label-width="120px" style="padding-right: 30px" :inline="true">
                 <el-form-item label="问卷名称" prop="name">
-                    <el-input v-model="questionnaireModel.name" minlength="1" maxlength="15"></el-input>
+                    <el-input v-model="questionnaireModel.name" maxlength="15"></el-input>
                 </el-form-item>
                 <el-form-item label="问卷介绍" prop="description">
-                    <el-input v-model="questionnaireModel.description" minlength="1" maxlength="50"></el-input>
+                    <el-input v-model="questionnaireModel.description" maxlength="50"></el-input>
                 </el-form-item>
                 <el-form-item label="标签" prop="tag">
                     <el-select v-model="questionnaireModel.tag" placeholder="选择标签">
@@ -390,7 +390,7 @@ const clearData = () => {
 const toDeleteQuestionnaire = (row) => {
     //提示用户  确认框
     ElMessageBox.confirm(
-        '你确认要删除该问卷信息吗?',
+        '确定要删除该问卷信息吗?',
         '温馨提示',
         {
             confirmButtonText: '确认',
