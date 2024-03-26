@@ -8,7 +8,7 @@
                 </div>
             </div>
         </template>
-        <el-table :data="questionnaire" style="width: 100%">
+        <el-table :data="questionnaireShowing" style="width: 100%">
             <!-- <el-table-column label="序号" width="70" prop="id"> </el-table-column> -->
             <el-table-column label="问卷名称" prop="name" width="250">
                 <template #default="scope">
@@ -102,6 +102,11 @@
                 </span>
             </template>
         </el-dialog>
+
+        <!-- 分页 -->
+      <div class="pagination">
+        <el-pagination background layout="prev, pager, next" :default-page-size="6" :total="questionnaire.length" :current-page="page" @current-change="changePage"/>
+      </div>
     </el-card>
 </template>
 
@@ -110,9 +115,9 @@ import {
     Edit,
     Delete
 } from '@element-plus/icons-vue'
-import { ref } from 'vue'
+import { ref, computed } from 'vue'
 import { getQuestionnaire, addQuestionnaire, updateQuestionnaire, deleteQuestionnaire } from '@/api/questionnaire.js'
-import { ElMessage, ElMessageBox } from 'element-plus'
+import { ElMessage, ElMessageBox, ElPagination } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { userInfoService } from '@/api/user.js'
 import useUserInfoStore from '@/stores/userInfo.js'
@@ -122,6 +127,19 @@ const router = useRouter();
 const questionnaire = ref([])
 // 是否为管理员的标志
 const administrator = ref(false)
+// 展示的问卷数据
+const questionnaireShowing = ref([])
+// 总页数
+// const pages = computed(()=>{
+//     return Math.ceil(questionnaire.value.length / 6)
+// })
+// 页数
+const page = ref(1)
+
+const changePage = (index) => {
+    page.value = index
+    questionnaireShowing.value = questionnaire.value.slice((index - 1) * 6, index * 6)
+}
 
 //调用函数,获取用户详细信息
 const getUserInfo = async () => {
@@ -138,6 +156,7 @@ const getQuestionnaireData = async () => {
     const questionnaireData = await getQuestionnaire(userInfoStore?.info?.organization)
     administrator.value = userInfoStore?.info?.administrator === 1 ? true : false
     questionnaire.value = [...questionnaireData?.data]
+    questionnaireShowing.value = questionnaire.value.slice((page.value - 1) * 6, page.value * 6)
 }
 
 // 如果已经有了用户数据就只要获取问卷数据就可以了
@@ -316,7 +335,8 @@ const toAddQuestionnaire = async () => {
         //调用接口
         await addQuestionnaire(questionnaireModel.value);
         ElMessage.success('添加成功')
-
+        // 页数跳到最后一页
+        page.value = Math.ceil((questionnaire.value.length + 1) / 6)
         //调用获取所有文章问卷的函数
         getQuestionnaireData();
         dialogVisible.value = false;
@@ -405,6 +425,9 @@ const toDeleteQuestionnaire = (row) => {
                 type: 'success',
                 message: '删除成功',
             })
+            if(questionnaire.value.length % 6 === 1 && page.value == Math.ceil(questionnaire.value.length/6)) {
+                page.value--
+            }
             //刷新列表
             getQuestionnaireData();
         })
@@ -484,5 +507,12 @@ const openQuestionnaireByAdministrator = (questionnaireModel) => {
     .clickable:hover{
         color: blue;
     }
+
+    .pagination{
+        position: fixed;
+        bottom: 120px;
+        left: 50%;
+    }
 }
+
 </style>

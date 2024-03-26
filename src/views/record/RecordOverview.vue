@@ -8,7 +8,7 @@
               </div> -->
           </div>
       </template>
-      <el-table :data="records" style="width: 100%">
+      <el-table :data="recordsShowing" style="width: 100%">
             <el-table-column label="问卷名称" prop="name" width="250">
                 <template #default="scope">
                     <div class="clickable" @click="openRecord()">{{ scope?.row?.questionnaireName }}</div>
@@ -31,19 +31,34 @@
                 <el-empty description="没有数据" />
             </template>
         </el-table>
+
+        <!-- 分页 -->
+        <div class="pagination">
+          <el-pagination background layout="prev, pager, next" :default-page-size="6" :total="records.length" :current-page="page" @current-change="changePage"/>
+        </div>
   </el-card>
 </template>
 
 <script setup>
 import { ref } from 'vue'
 import { getRecord } from '@/api/record';
+import { ElMessage, ElMessageBox, ElPagination } from 'element-plus'
 import useUserInfoStore from '@/stores/userInfo.js'
 const userInfoStore = useUserInfoStore();
 // 测评记录数据
 const records = ref([])
+// 展示的测评记录数据
+const recordsShowing = ref([])
+// 页数
+const page = ref(1)
+const changePage = (index) => {
+  page.value = index
+  recordsShowing.value = records.value.slice((index - 1) * 6,index * 6)
+}
 const getRecordData = async (userId) => {
   let res = await getRecord(userId)
   records.value = [...res?.data]
+  recordsShowing.value = records.value.slice((page.value - 1) * 6,page.value * 6)
 }
 getRecordData(userInfoStore?.info?.id)
 
@@ -76,6 +91,12 @@ const openRecord = () => {
   .body {
     height: 350px;
 
+  }
+
+  .pagination{
+    position: fixed;
+    bottom: 120px;
+    left: 50%;
   }
 
 }
