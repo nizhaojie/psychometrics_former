@@ -5,10 +5,10 @@
                 <span class="title">测评问卷</span>
                 <el-input
                     v-model="searchParameter"
-                    style="max-width: 800px"
                     placeholder="请输入查询关键词"
-                    class="input-with-select"
+                    :class="['input-with-select', administrator ? 'maxWidth1' : 'maxWidth2']"
                     @keydown.enter="search"
+                    maxlength="40"
                 >
                     <template #prepend>
                         <el-select v-model="searchType" style="width: 115px">
@@ -513,16 +513,17 @@ const openQuestionnaireByAdministrator = (questionnaireModel) => {
 
 // 查询函数
 const search = () => {
+    if(searchType.value === '关键词类型') {
+        ElMessage.error('请选择查询关键词的类型')
+        return
+    }
     if(searchParameter.value.trim() === '') {
         // 重置
         questionnaire.value = questionnaireStore
         changePage(1)
         return
     }
-    if(searchType.value === '关键词类型') {
-        ElMessage.error('请选择查询关键词的类型')
-        return
-    }
+    questionnaire.value = questionnaireStore
     if(searchType.value === '问卷名称') {
         questionnaire.value = questionnaire.value.filter(item => item.name.includes(searchParameter.value))
     } else if(searchType.value === '问卷介绍') {
@@ -530,7 +531,7 @@ const search = () => {
     } else if(searchType.value === '问卷标签') {
         questionnaire.value = questionnaire.value.filter(item => item.tag.includes(searchParameter.value))
     }
-    changePage(1)
+    changePage(page.value)
 }
 </script>
 
@@ -549,6 +550,14 @@ const search = () => {
             font-size: large;
             font-weight: 600;
         }   
+
+        .maxWidth1 {
+            max-width: 800px
+        }
+
+        .maxWidth2 {
+            max-width: 1000px
+        }
 
         .input-with-select .el-input-group__prepend {
             background-color: var(--el-fill-color-blank);
