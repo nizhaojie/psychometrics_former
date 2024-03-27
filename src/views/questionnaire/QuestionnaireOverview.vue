@@ -3,6 +3,28 @@
         <template #header>
             <div class="header">
                 <span class="title">测评问卷</span>
+                <el-input
+                    v-model="searchParameter"
+                    style="max-width: 800px"
+                    placeholder="请输入查询关键词"
+                    class="input-with-select"
+                    @keydown.enter="search"
+                >
+                    <template #prepend>
+                        <el-select v-model="searchType" style="width: 115px">
+                            <el-option label="问卷名称" value="问卷名称" />
+                            <el-option label="问卷介绍" value="问卷介绍" />
+                            <el-option label="问卷标签" value="问卷标签" />
+                        </el-select>
+                    </template>
+                    <template #append>
+                        <el-button @click="search">
+                            <el-icon style="vertical-align: middle">
+                                <Search />
+                            </el-icon>          
+                        </el-button>
+                    </template>
+                </el-input>
                 <div class="extra" v-if="administrator">
                     <el-button type="primary" @click="dialogVisible = true; title = '添加问卷';">添加问卷</el-button>
                 </div>
@@ -117,7 +139,7 @@ import {
 } from '@element-plus/icons-vue'
 import { ref, computed } from 'vue'
 import { getQuestionnaire, addQuestionnaire, updateQuestionnaire, deleteQuestionnaire } from '@/api/questionnaire.js'
-import { ElMessage, ElMessageBox, ElPagination } from 'element-plus'
+import { ElMessage, ElMessageBox, ElPagination, ElInput } from 'element-plus'
 import { useRouter } from 'vue-router'
 import { userInfoService } from '@/api/user.js'
 import useUserInfoStore from '@/stores/userInfo.js'
@@ -125,17 +147,15 @@ const userInfoStore = useUserInfoStore();
 const router = useRouter();
 // 问卷数据
 const questionnaire = ref([])
+// 问卷数据备份
+let questionnaireStore = []
 // 是否为管理员的标志
 const administrator = ref(false)
 // 展示的问卷数据
 const questionnaireShowing = ref([])
-// 总页数
-// const pages = computed(()=>{
-//     return Math.ceil(questionnaire.value.length / 6)
-// })
 // 页数
 const page = ref(1)
-
+// 切页
 const changePage = (index) => {
     page.value = index
     questionnaireShowing.value = questionnaire.value.slice((index - 1) * 6, index * 6)
@@ -156,7 +176,12 @@ const getQuestionnaireData = async () => {
     const questionnaireData = await getQuestionnaire(userInfoStore?.info?.organization)
     administrator.value = userInfoStore?.info?.administrator === 1 ? true : false
     questionnaire.value = [...questionnaireData?.data]
-    questionnaireShowing.value = questionnaire.value.slice((page.value - 1) * 6, page.value * 6)
+    questionnaireStore = [...questionnaireData?.data]
+    // 如果是查询状态就再查询一次
+    if(searchParameter.value.trim() !== '') {
+        search()
+    } else changePage(page.value)
+    // questionnaireShowing.value = questionnaire.value.slice((page.value - 1) * 6, page.value * 6)
 }
 
 // 如果已经有了用户数据就只要获取问卷数据就可以了
@@ -168,6 +193,11 @@ if(!userInfoStore?.info?.organization) {
 const title = ref('')
 //控制添加问卷弹窗
 const dialogVisible = ref(false)
+
+// 关键词类型
+const searchType = ref('关键词类型')
+// 搜索的关键词
+const searchParameter = ref('')
 
 //添加问卷数据模型
 const questionnaireModel = ref({
@@ -360,7 +390,7 @@ const showDialog = (row) => {
         s3 = 'result' + i
         questionnaireModel.value[s1] = i < 3 ? row[s1] : row[s1] || null
         questionnaireModel.value[s2] = i < 3 ? row[s2] : row[s2] || null
-        questionnaireModel.value[s3] = row[s3]
+        questionnaireModel.value[s3] = row[s3] || ''
     }
     //扩展id属性,将来需要传递给后台,完成问卷的修改
     questionnaireModel.value.id = row.id
@@ -425,6 +455,7 @@ const toDeleteQuestionnaire = (row) => {
                 type: 'success',
                 message: '删除成功',
             })
+            // 如果是删除最后一页的最后一个问卷,则页数要减1
             if(questionnaire.value.length % 6 === 1 && page.value == Math.ceil(questionnaire.value.length/6)) {
                 page.value--
             }
@@ -480,6 +511,27 @@ const openQuestionnaireByAdministrator = (questionnaireModel) => {
     })
 }
 
+// 查询函数
+const search = () => {
+    if(searchParameter.value.trim() === '') {
+        // 重置
+        questionnaire.value = questionnaireStore
+        changePage(1)
+        return
+    }
+    if(searchType.value === '关键词类型') {
+        ElMessage.error('请选择查询关键词的类型')
+        return
+    }
+    if(searchType.value === '问卷名称') {
+        questionnaire.value = questionnaire.value.filter(item => item.name.includes(searchParameter.value))
+    } else if(searchType.value === '问卷介绍') {
+        questionnaire.value = questionnaire.value.filter(item => item.description.includes(searchParameter.value))
+    } else if(searchType.value === '问卷标签') {
+        questionnaire.value = questionnaire.value.filter(item => item.tag.includes(searchParameter.value))
+    }
+    changePage(1)
+}
 </script>
 
 
@@ -494,9 +546,13 @@ const openQuestionnaireByAdministrator = (questionnaireModel) => {
         justify-content: space-between;
         
         .title {
-        font-size: large;
-        font-weight: 600;
-    }
+            font-size: large;
+            font-weight: 600;
+        }   
+
+        .input-with-select .el-input-group__prepend {
+            background-color: var(--el-fill-color-blank);
+        }
     }
 
 
