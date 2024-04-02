@@ -13,7 +13,8 @@
                     </el-icon>
                     <span>测评问卷</span>
                 </el-menu-item>
-                <el-menu-item index="/record/overview">
+                <!-- 根据是否为管理员,呈现不同的测评记录页面 -->
+                <el-menu-item :index="administrator ? '/record/administratorOverview' : '/record/overview'">
                     <el-icon>
                         <List />
                     </el-icon>
@@ -96,18 +97,21 @@ import {
     CaretBottom
 } from '@element-plus/icons-vue'
 import avatar from '@/assets/default.png'
-
+import { ref } from 'vue'
 import { userInfoService } from '@/api/user.js'
 import useUserInfoStore from '@/stores/userInfo.js'
 import { useTokenStore } from '@/stores/token.js'
 const tokenStore = useTokenStore();
 const userInfoStore = useUserInfoStore();
+// 是否为管理员的标志
+const administrator = ref(false)
 //调用函数,获取用户详细信息
 const getUserInfo = async () => {
     //调用接口
     let result = await userInfoService();
     //数据存储到pinia中
     userInfoStore.setInfo(result.data);
+    administrator.value = userInfoStore?.info?.administrator === 1 ? true : false
 }
 
 getUserInfo();

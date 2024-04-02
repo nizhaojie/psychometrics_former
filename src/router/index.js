@@ -10,6 +10,7 @@ const routes = [
             { path: '/questionnaire/update', component: import("@/views/questionnaire/QuestionnaireUpdate.vue") },
             { path: '/record/detail', component: import("@/views/record/RecordDetail.vue") },
             { path: '/record/overview', component: () => import("@/views/record/RecordOverview.vue") },
+            { path: '/record/administratorOverview', component: () => import("@/views/record/AdministratorRecordOverview.vue") },
             { path: '/user/info', component: () => import("@/views/user/UserInfo.vue") },
             { path: '/user/avatar', component: () => import("@/views/user/UserAvatar.vue") },
             { path: '/user/resetPassword', component: () => import("@/views/user/UserResetPassword.vue") },

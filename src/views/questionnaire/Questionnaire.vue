@@ -114,8 +114,6 @@ const changePage = (page) => {
   changeQuestion(page - 1)
 }
 
-
-
 // 返回问卷列表
 const backToOverview = () => {
   router.push('/questionnaire/overview')
@@ -138,7 +136,7 @@ const submitQuestionnaire = () => {
     s1 = 'lowerlimit' + i
     s2 = 'upperlimit' + i
     s3 = 'result' + i
-    if(score > router?.currentRoute?._rawValue?.query[s1] && score < router?.currentRoute?._rawValue?.query[s2]) {
+    if(score >= router?.currentRoute?._rawValue?.query[s1] && score <= router?.currentRoute?._rawValue?.query[s2]) {
       let res = router?.currentRoute?._rawValue?.query[s3]
       // 添加记录
       toAddRecord(score,res)
@@ -147,7 +145,8 @@ const submitQuestionnaire = () => {
         path: '/record/detail',
         query: {
           score: score,
-          result: res
+          result: res,
+          questionnaireName: questionnaireName.value
         }
       })
       return
@@ -165,12 +164,13 @@ const toAddRecord = (score,res) => {
   let minutes = ('0' + now.getMinutes()).slice(-2);
   let record = {
     userId: userInfoStore?.info?.id,
+    username: userInfoStore?.info?.username,
+    organization: userInfoStore?.info?.organization,
     questionnaireName: questionnaireName.value,
     time: year + '/' + month + '/' + day + '/ ' + hours + ':' + minutes,
     score: score,
     report: res
   }
-  // console.log('record',record);
   addRecord(record)
 }
 </script>

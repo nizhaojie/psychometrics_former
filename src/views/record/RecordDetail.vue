@@ -2,18 +2,20 @@
   <el-card class="page-container">
       <template #header>
           <div class="header">
-            <el-button type="primary" @click="backToOverview">
+            <!-- <el-button type="primary" @click="backToQuestionnaireOverview">
                 <el-icon><Back /></el-icon>
                 返回问卷列表
+            </el-button> -->
+            <el-button type="primary" @click="backToRecordOverview">
+                <el-icon><Back /></el-icon>
+                返回测评记录列表
             </el-button>
-              <span class="title">您的分数为: {{ score }}</span>
-              <!-- <div class="extra">
-                  <el-button type="primary" @click="submitQuestionnaire" :disabled="percentage !== 100">提交问卷</el-button>
-              </div> -->
+              <span class="questionnaireName">《{{ questionnaireName }}》</span>
+              <span class="title">分数为: {{ score }}</span>
           </div>
       </template>
 
-      <!-- 题干 -->
+      <!-- 报告 -->
       <div class="body">
         <el-text>{{ result }}</el-text>
       </div>
@@ -22,19 +24,31 @@
 
 <script setup>
 import { ref } from 'vue'
-
 import { ElText } from 'element-plus'
 import { useRouter } from 'vue-router'
+import useUserInfoStore from '@/stores/userInfo.js'
+const userInfoStore = useUserInfoStore();
 const router = useRouter();
-// 问卷id和问卷名称
+// 问卷名称，问卷分数，问卷结论
+const questionnaireName = ref('')
 const score = ref(0)
 const result = ref('')
+questionnaireName.value = router?.currentRoute?._rawValue?.query?.questionnaireName
 score.value = router?.currentRoute?._rawValue?.query?.score
 result.value = router?.currentRoute?._rawValue?.query?.result
 
 // 返回问卷列表
-const backToOverview = () => {
-  router.push('/questionnaire/overview')
+// const backToQuestionnaireOverview = () => {
+//   router.push('/questionnaire/overview')
+// }
+
+// 返回测评记录列表
+const backToRecordOverview = () => {
+  if(userInfoStore?.info?.administrator === 1) {
+    router.push('/record/administratorOverview')
+  } else if(userInfoStore?.info?.administrator === 0) {
+    router.push('/record/overview')
+  }
 }
 </script>
 
@@ -47,6 +61,11 @@ const backToOverview = () => {
       display: flex;
       align-items: center;
       justify-content: space-between;
+
+    .questionnaireName {
+      font-size: large;
+      font-weight: 600;
+    }
 
     .title {
         font-size: large;

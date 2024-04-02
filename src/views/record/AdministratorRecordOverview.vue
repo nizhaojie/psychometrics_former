@@ -2,29 +2,26 @@
   <el-card class="page-container">
       <template #header>
           <div class="header">
-              <span class="title">测评记录</span>
-              <!-- <div class="extra">
-                  <el-button type="primary" @click="submitQuestionnaire" :disabled="percentage !== 100">提交问卷</el-button>
-              </div> -->
+              <span class="title">普通用户测评记录</span>
               <el-input
                     v-model="searchParameter"
-                    style="max-width: 1000px"
-                    placeholder="请输入查询关键词"
+                    style="max-width: 1050px"
+                    placeholder="选择关键词类型并输入关键词进行查询"
                     class="input-with-select"
                     @keydown.enter="search"
                 >
                     <template #prepend>
                         <el-select v-model="searchType" style="width: 115px">
+                            <el-option label="用户名称" value="用户名称" />
                             <el-option label="问卷名称" value="问卷名称" />
                             <el-option label="测评时间" value="测评时间" />
-                            <el-option label="问卷状态" value="问卷状态" />
                         </el-select>
                     </template>
                     <template #append>
                         <el-button @click="search">
                             <el-icon style="vertical-align: middle">
                                 <Search />
-                            </el-icon>          
+                            </el-icon>
                         </el-button>
                     </template>
                 </el-input>
@@ -36,6 +33,7 @@
                     <div class="clickable" @click="openRecord(scope?.row?.score,scope?.row?.report,scope?.row?.questionnaireName)">{{ scope?.row?.questionnaireName }}</div>
                 </template>
             </el-table-column>
+            <el-table-column label="测评用户" prop="username"></el-table-column>
             <el-table-column label="测评时间" prop="time"></el-table-column>
             <el-table-column label="测评分数" prop="score">
               <template #default="scope">
@@ -50,7 +48,7 @@
                 </template>
             </el-table-column>
             <template #empty>
-                <el-empty description="没有数据" />
+                <el-empty description="选择关键词类型并输入关键词进行查询" />
             </template>
         </el-table>
 
@@ -63,7 +61,7 @@
 
 <script setup>
 import { ref } from 'vue'
-import { getRecord } from '@/api/record';
+import { getRecordByUserName, getRecordByQuestionnaireName, getRecordByTime } from '@/api/record';
 import { ElMessage, ElPagination, ElInput } from 'element-plus'
 import useUserInfoStore from '@/stores/userInfo.js'
 const userInfoStore = useUserInfoStore();
@@ -71,8 +69,6 @@ import { useRouter } from 'vue-router'
 const router = useRouter();
 // 测评记录数据
 const records = ref([])
-// 测评记录数据备份
-let recordsStore = []
 // 展示的测评记录数据
 const recordsShowing = ref([])
 // 页数
@@ -82,41 +78,31 @@ const changePage = (index) => {
   page.value = index
   recordsShowing.value = records.value.slice((index - 1) * 6,index * 6)
 }
-// 获取记录数据
-const getRecordData = async (userId) => {
-  let res = await getRecord(userId)
-  records.value = [...res?.data]
-  recordsStore = [...res?.data]
-  recordsShowing.value = records.value.slice((page.value - 1) * 6,page.value * 6)
-}
-getRecordData(userInfoStore?.info?.id)
 
 // 关键词类型
 const searchType = ref('关键词类型')
 // 搜索的关键词
 const searchParameter = ref('')
 // 搜索函数
-const search = () => {
+const search = async () => {
   if(searchType.value === '关键词类型') {
     ElMessage.error('请选择查询关键词的类型')
     return
   }
   if(searchParameter.value.trim() === '') {
-    // 重置
-    records.value = recordsStore
-    changePage(1)
+    ElMessage.error('请输入查询关键词')
     return
   }
-  records.value = recordsStore
-  if(searchType.value === '问卷名称') {
-    records.value = records.value.filter(item => item.questionnaireName.includes(searchParameter.value))
+  if(searchType.value === '用户名称') {
+    let res = await getRecordByUserName(searchParameter.value,userInfoStore?.info?.organization)
+    records.value = [...res?.data]
+  } else if(searchType.value === '问卷名称') {
+    let res = await getRecordByQuestionnaireName(searchParameter.value,userInfoStore?.info?.organization)
+    records.value = [...res?.data]
   } else if(searchType.value === '测评时间') {
-    records.value = records.value.filter(item => item.time.includes(searchParameter.value))
-  } else if(searchType.value === '问卷状态' && searchParameter.value === '已完成') {
-    records.value = records.value.filter(item => item.score >= 0)
-  } else if(searchType.value === '问卷状态' && searchParameter.value === '未完成') {
-    records.value = records.value.filter(item => item.score === -1)
-  } else records.value = []
+    let res = await getRecordByTime(searchParameter.value,userInfoStore?.info?.organization)
+    records.value = [...res?.data]
+  }
   changePage(1)
 }
 
