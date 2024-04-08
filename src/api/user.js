@@ -48,3 +48,11 @@ export const getOrganizations = () => {
     return request.get('/organization')
 }
 
+// 根据组织获取普通用户数据
+export const findByOrganization = (organization) => {
+    return request.get('/user/findByOrganization',{
+        params: {
+            organization: organization
+        }
+    })
+}

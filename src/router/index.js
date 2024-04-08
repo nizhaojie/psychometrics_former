@@ -14,6 +14,9 @@ const routes = [
             { path: '/user/info', component: () => import("@/views/user/UserInfo.vue") },
             { path: '/user/avatar', component: () => import("@/views/user/UserAvatar.vue") },
             { path: '/user/resetPassword', component: () => import("@/views/user/UserResetPassword.vue") },
+            { path: '/guidance/giver', component: () => import("@/views/guidance/GuidanceGiver.vue") },
+            { path: '/guidance/receiver', component: () => import("@/views/guidance/GuidanceReceiver.vue") },
+            { path: '/guidance/detail', component: () => import("@/views/guidance/GuidanceDetail.vue") },
         ]
     },
 ]

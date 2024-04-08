@@ -523,13 +523,12 @@ const search = () => {
         changePage(1)
         return
     }
-    questionnaire.value = questionnaireStore
     if(searchType.value === '问卷名称') {
-        questionnaire.value = questionnaire.value.filter(item => item.name.includes(searchParameter.value))
+        questionnaire.value = questionnaireStore.filter(item => item.name.includes(searchParameter.value))
     } else if(searchType.value === '问卷介绍') {
-        questionnaire.value = questionnaire.value.filter(item => item.description.includes(searchParameter.value))
+        questionnaire.value = questionnaireStore.filter(item => item.description.includes(searchParameter.value))
     } else if(searchType.value === '问卷标签') {
-        questionnaire.value = questionnaire.value.filter(item => item.tag.includes(searchParameter.value))
+        questionnaire.value = questionnaireStore.filter(item => item.tag.includes(searchParameter.value))
     }
     changePage(page.value)
 }
