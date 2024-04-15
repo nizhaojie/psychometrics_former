@@ -16,9 +16,16 @@
                 <!-- 根据是否为管理员,呈现不同的测评记录页面 -->
                 <el-menu-item :index="administrator ? '/record/administratorOverview' : '/record/overview'">
                     <el-icon>
-                        <List />
+                        <Checked />
                     </el-icon>
                     <span>测评记录</span>
+                </el-menu-item>
+                   <!-- 根据是否为管理员,呈现不同的测评任务界面 -->
+                <el-menu-item :index="administrator ? '/task/giver' : '/task/receiver'">
+                    <el-icon>
+                        <List />
+                    </el-icon>
+                    <span>测评任务</span>
                 </el-menu-item>
                   <!-- 根据是否为管理员,呈现不同的健康指导建议界面 -->
                   <el-menu-item :index="administrator ? '/guidance/giver' : '/guidance/receiver'">

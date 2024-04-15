@@ -34,11 +34,20 @@ import { useTokenStore } from '@/stores/token.js'
 
 // }
 
-//获取问卷概览数据
+//根据组织获取问卷概览数据
 export const getQuestionnaire = (organization) => {
-    return request.get('/questionnaire',{
+    return request.get('/questionnaire/organization',{
         params: {
             organization: organization
+        }
+    })
+}
+
+// 根据问卷id获取问卷数据
+export const getQuestionnaireById = (id) => {
+    return request.get('/questionnaire/id',{
+        params: {
+            id: id
         }
     })
 }

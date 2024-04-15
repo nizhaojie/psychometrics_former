@@ -17,6 +17,8 @@ const routes = [
             { path: '/guidance/giver', component: () => import("@/views/guidance/GuidanceGiver.vue") },
             { path: '/guidance/receiver', component: () => import("@/views/guidance/GuidanceReceiver.vue") },
             { path: '/guidance/detail', component: () => import("@/views/guidance/GuidanceDetail.vue") },
+            { path: '/task/giver', component: () => import("@/views/task/TaskGiver.vue") },
+            { path: '/task/receiver', component: () => import("@/views/task/TaskReceiver.vue") },
         ]
     },
 ]

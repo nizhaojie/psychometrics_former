@@ -30,12 +30,12 @@
       <el-table :data="guidanceShowing" style="width: 100%">
             <el-table-column label="建议人" prop="giver" width="200">
                 <template #default="scope">
-                    <div class="clickable" @click="openGuidance(scope?.row?.id,scope?.row?.content,scope?.row?.state)">{{ scope?.row?.giver }}</div>
+                    <div>{{ scope?.row?.giver }}</div>
                 </template>
             </el-table-column>
             <el-table-column label="建议内容" prop="content">
               <template #default="scope">
-                <el-text truncated>{{ scope?.row?.content }}</el-text>
+                <el-text truncated class="clickable" @click="openGuidance(scope?.row?.id,scope?.row?.content,scope?.row?.state)">{{ scope?.row?.content }}</el-text>
               </template>
             </el-table-column>
             <el-table-column label="建议时间" prop="time" width="200"></el-table-column>
