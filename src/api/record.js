@@ -1,5 +1,4 @@
 import request from '@/utils/request.js'
-import { useTokenStore } from '@/stores/token.js'
 
 // 新增记录
 export const addRecord = (record) => {

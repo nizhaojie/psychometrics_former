@@ -188,7 +188,7 @@ const toAddTask = async () => {
   let minutes = ('0' + now.getMinutes()).slice(-2);
   taskModel.value.time = year + '/' + month + '/' + day + '/ ' + hours + ':' + minutes
   ElMessageBox.confirm(
-        '创建任务后无法修改，请再次确认内容无误',
+        '任务创建后无法修改，请再次确认内容无误',
         '温馨提示',
         {
             confirmButtonText: '已确认',
