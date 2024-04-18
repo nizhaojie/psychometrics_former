@@ -160,6 +160,14 @@ const getOrganizationData = async () => {
 
 // 注册函数
 const register = async () => {
+    if(registerData.value.username.length < 3 || registerData.value.username.length > 20) {
+        ElMessage.error("请输入正确格式的用户名")
+        return
+    }
+    if(registerData.value.password.length < 8 || registerData.value.username.length > 20) {
+        ElMessage.error("请输入正确格式的密码")
+        return
+    }
     let result = await userRegisterService(registerData.value);
     ElMessage.success('注册成功')
     isRegister.value = false
@@ -168,6 +176,14 @@ const register = async () => {
 
 // 登录函数
 const login = async () => {
+    if(registerData.value.username.length < 3 || registerData.value.username.length > 20) {
+        ElMessage.error("请输入正确格式的用户名")
+        return
+    }
+    if(registerData.value.password.length < 8 || registerData.value.username.length > 20) {
+        ElMessage.error("请输入正确格式的密码")
+        return
+    }
     //调用接口,完成登录
    let result = await userLoginService(registerData.value);
    ElMessage.success('登录成功')
@@ -198,7 +214,7 @@ const clearRegisterData = () => {
     background-color: #fff;
 
     .bg {
-        background: url('@/assets/logo2.png') no-repeat 60% center / 240px auto,
+        background: url('@/assets/logo2.png') no-repeat 50% center / 480px auto,
             url('@/assets/login_bg.jpg') no-repeat center / cover;
         border-radius: 0 20px 20px 0;
     }
