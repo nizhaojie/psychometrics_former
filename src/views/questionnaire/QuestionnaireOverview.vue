@@ -14,7 +14,10 @@
                         <el-select v-model="searchType" style="width: 115px">
                             <el-option label="问卷名称" value="问卷名称" />
                             <el-option label="问卷介绍" value="问卷介绍" />
-                            <el-option label="问卷标签" value="问卷标签" />
+                            <el-option label="智力类型" value="智力类型" />
+                            <el-option label="情商类型" value="情商类型" />
+                            <el-option label="职业类型" value="职业类型" />
+                            <el-option label="个性类型" value="个性类型" />
                         </el-select>
                     </template>
                     <template #append>
@@ -55,7 +58,7 @@
         </el-table>
 
         <!-- 添加问卷弹窗 -->
-        <el-dialog v-model="dialogVisible" :title="title" width="80%">
+        <el-dialog v-model="dialogVisible" :title="title" width="80%" @close="clearData()">
             <el-form :model="questionnaireModel" :rules="rules" label-width="120px" style="padding-right: 30px" :inline="true">
                 <el-form-item label="问卷名称" prop="name">
                     <el-input v-model="questionnaireModel.name" maxlength="15"></el-input>
@@ -116,6 +119,9 @@
                 <el-form-item label="区间5结论" prop="result5">
                     <el-input v-model="questionnaireModel.result5" maxlength="120" show-word-limit></el-input>
                 </el-form-item>
+                <el-form-item label="预警阈值" prop="threshold">
+                    <el-input-number v-model="questionnaireModel.threshold" :min="1" :max="100" :precision="0"></el-input-number>
+                </el-form-item>
             </el-form>
             <template #footer>
                 <span class="dialog-footer">
@@ -137,7 +143,7 @@ import {
     Edit,
     Delete
 } from '@element-plus/icons-vue'
-import { ref, computed } from 'vue'
+import { ref } from 'vue'
 import { getQuestionnaire, addQuestionnaire, updateQuestionnaire, deleteQuestionnaire } from '@/api/questionnaire.js'
 import { ElMessage, ElMessageBox, ElPagination, ElInput } from 'element-plus'
 import { useRouter } from 'vue-router'
@@ -205,6 +211,7 @@ const questionnaireModel = ref({
     description: '',
     organization: userInfoStore?.info?.organization,
     tag: '',
+    threshold: 60,
     lowerlimit1: 0,
     upperlimit1: 50,
     result1: '',
@@ -290,6 +297,9 @@ const rules = {
     result2: [
         { required: true, trigger: ['change','blur'], validator: checkResult }
     ],
+    threshold: [
+        { required: true }
+    ]
 }
 
 const checkquestionnaireModel = (questionnaireModel) => {
@@ -381,6 +391,7 @@ const showDialog = (row) => {
     questionnaireModel.value.name = row.name;
     questionnaireModel.value.description = row.description;
     questionnaireModel.value.tag = row.tag
+    questionnaireModel.value.threshold = row.threshold
     let s1 = ''
     let s2 = ''
     let s3 = ''
@@ -418,6 +429,7 @@ const clearData = () => {
         description: '',
         organization: userInfoStore?.info?.organization,
         tag: '',
+        threshold: 60,
         lowerlimit1: 0,
         upperlimit1: 50,
         result1: '',
@@ -432,7 +444,7 @@ const clearData = () => {
         result4: '',
         lowerlimit5: null,
         upperlimit5: null,
-        result5: '',
+        result5: ''
     }
 }
 
@@ -496,7 +508,8 @@ const openQuestionnaireByUser = (questionnaireModel) => {
             result2: questionnaireModel.result2,
             result3: questionnaireModel.result3,
             result4: questionnaireModel.result4,
-            result5: questionnaireModel.result5
+            result5: questionnaireModel.result5,
+            threshold: questionnaireModel.threshold
         }
     })
 }
@@ -511,13 +524,15 @@ const openQuestionnaireByAdministrator = (questionnaireModel) => {
     })
 }
 
+const arr = ["智力类型","情商类型","职业类型","个性类型"]
+
 // 查询函数
 const search = () => {
     if(searchType.value === '关键词类型') {
         ElMessage.error('请选择查询关键词的类型')
         return
     }
-    if(searchParameter.value.trim() === '') {
+    if(searchParameter.value.trim() === '' && !arr.includes(searchType.value)) {
         // 重置
         questionnaire.value = questionnaireStore
         changePage(1)
@@ -527,8 +542,14 @@ const search = () => {
         questionnaire.value = questionnaireStore.filter(item => item.name.includes(searchParameter.value))
     } else if(searchType.value === '问卷介绍') {
         questionnaire.value = questionnaireStore.filter(item => item.description.includes(searchParameter.value))
-    } else if(searchType.value === '问卷标签') {
-        questionnaire.value = questionnaireStore.filter(item => item.tag.includes(searchParameter.value))
+    } else if(searchType.value === '智力类型') {
+        questionnaire.value = questionnaireStore.filter(item => item.tag === "智力")
+    } else if(searchType.value === '情商类型') {
+        questionnaire.value = questionnaireStore.filter(item => item.tag === "情商")
+    } else if(searchType.value === '职业类型') {
+        questionnaire.value = questionnaireStore.filter(item => item.tag === "职业")
+    } else if(searchType.value === '个性类型') {
+        questionnaire.value = questionnaireStore.filter(item => item.tag === "个性")
     }
     changePage(page.value)
 }

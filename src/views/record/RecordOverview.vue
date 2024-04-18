@@ -14,14 +14,15 @@
                         <el-select v-model="searchType" style="width: 115px">
                             <el-option label="问卷名称" value="问卷名称" />
                             <el-option label="测评时间" value="测评时间" />
-                            <el-option label="问卷状态" value="问卷状态" />
+                            <el-option label="及格" value="及格" />
+                            <el-option label="不及格" value="不及格" />
                         </el-select>
                     </template>
                     <template #append>
                         <el-button @click="search">
                             <el-icon style="vertical-align: middle">
                                 <Search />
-                            </el-icon>          
+                            </el-icon>
                         </el-button>
                     </template>
                 </el-input>
@@ -39,10 +40,10 @@
                 {{ scope?.row?.score !== -1 ? scope?.row?.score : '暂无'  }}
               </template>
             </el-table-column>
-            <el-table-column label="问卷状态" prop="score" width="100">
+            <el-table-column label="记录状态" prop="score" width="100">
                 <template #default="scope">
-                    <el-tag size="large" :type="scope?.row?.score !== -1 ?'success':'danger'">
-                      {{ scope?.row?.score !== -1 ? '已完成' : '未完成' }}
+                    <el-tag size="large" :type="scope?.row?.state === 1 ?'success':'danger'">
+                      {{ scope?.row?.state === 1 ? '及格' : '不及格' }}
                     </el-tag>
                 </template>
             </el-table-column>
@@ -92,13 +93,16 @@ getRecordData(userInfoStore?.info?.id)
 const searchType = ref('关键词类型')
 // 搜索的关键词
 const searchParameter = ref('')
+
+const arr = ["及格","不及格"]
+
 // 搜索函数
 const search = () => {
   if(searchType.value === '关键词类型') {
     ElMessage.error('请选择查询关键词的类型')
     return
   }
-  if(searchParameter.value.trim() === '') {
+  if(searchParameter.value.trim() === '' && !arr.includes(searchType.value)) {
     // 重置
     records.value = recordsStore
     changePage(1)
@@ -108,10 +112,10 @@ const search = () => {
     records.value = recordsStore.filter(item => item.questionnaireName.includes(searchParameter.value))
   } else if(searchType.value === '测评时间') {
     records.value = recordsStore.filter(item => item.time.includes(searchParameter.value))
-  } else if(searchType.value === '问卷状态' && searchParameter.value === '已完成') {
-    records.value = recordsStore.filter(item => item.score >= 0)
-  } else if(searchType.value === '问卷状态' && searchParameter.value === '未完成') {
-    records.value = recordsStore.filter(item => item.score === -1)
+  } else if(searchType.value === '及格') {
+    records.value = recordsStore.filter(item => item.state === 1)
+  } else if(searchType.value === '不及格') {
+    records.value = recordsStore.filter(item => item.state === 0)
   } else records.value = []
   changePage(1)
 }

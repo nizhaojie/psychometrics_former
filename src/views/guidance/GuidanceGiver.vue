@@ -14,7 +14,8 @@
                         <el-select v-model="searchType" style="width: 115px">
                             <el-option label="被建议人" value="被建议人" />
                             <el-option label="建议时间" value="建议时间" />
-                            <el-option label="建议状态" value="建议状态" />
+                            <el-option label="未读" value="未读" />
+                            <el-option label="已读" value="已读" />
                         </el-select>
                     </template>
                     <template #append>
@@ -138,13 +139,16 @@ const openDialog = async () => {
 const searchType = ref('关键词类型')
 // 搜索的关键词
 const searchParameter = ref('')
+
+const arr = ["未读","已读"]
+
 // 搜索函数
 const search = () => {
   if(searchType.value === '关键词类型') {
     ElMessage.error('请选择查询关键词的类型')
     return
   }
-  if(searchParameter.value.trim() === '') {
+  if(searchParameter.value.trim() === '' && !arr.includes(searchType.value)) {
     // 重置
     guidance.value = guidanceStore
     changePage(1)
@@ -154,9 +158,9 @@ const search = () => {
     guidance.value = guidanceStore.filter(item => item.receiver.includes(searchParameter.value))
   } else if(searchType.value === '建议时间') {
     guidance.value = guidanceStore.filter(item => item.time.includes(searchParameter.value))
-  } else if(searchType.value === '建议状态' && searchParameter.value === '已读') {
+  } else if(searchType.value === '已读') {
     guidance.value = guidanceStore.filter(item => item.state === 1)
-  } else if(searchType.value === '建议状态' && searchParameter.value === '未读') {
+  } else if(searchType.value === '未读') {
     guidance.value = guidanceStore.filter(item => item.state === 0)
   } else guidance.value = []
   changePage(1)

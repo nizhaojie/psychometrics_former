@@ -45,11 +45,13 @@ const router = useRouter();
 import useUserInfoStore from '@/stores/userInfo.js'
 const userInfoStore = useUserInfoStore();
 
-// 问卷id和问卷名称
+// 问卷数据
 const questionnaireId = ref(0)
 const questionnaireName = ref('')
+const threshold = ref(0)
 questionnaireId.value = router?.currentRoute?._rawValue?.query?.questionnaireId
 questionnaireName.value = router?.currentRoute?._rawValue?.query?.questionnaireName
+threshold.value = router?.currentRoute?._rawValue?.query?.threshold
 
 
 // 所有题目数据
@@ -132,6 +134,7 @@ const submitQuestionnaire = () => {
     s = 'score' + answer
     score += questionData.value[i][s]
   }
+  let state = score >= threshold.value ? 1 : 0
   for(let i = 1; i < 6; i++) {
     s1 = 'lowerlimit' + i
     s2 = 'upperlimit' + i
@@ -139,7 +142,7 @@ const submitQuestionnaire = () => {
     if(score >= router?.currentRoute?._rawValue?.query[s1] && score <= router?.currentRoute?._rawValue?.query[s2]) {
       let res = router?.currentRoute?._rawValue?.query[s3]
       // 添加记录
-      toAddRecord(score,res)
+      toAddRecord(score,res,state)
       // 切换到结论界面
       router.push({
         path: '/record/detail',
@@ -155,7 +158,7 @@ const submitQuestionnaire = () => {
 }
 
 // 添加记录
-const toAddRecord = (score,res) => {
+const toAddRecord = (score,res,state) => {
   let now = new Date();
   let year = now.getFullYear();
   let month = ('0' + (now.getMonth() + 1)).slice(-2);
@@ -169,7 +172,8 @@ const toAddRecord = (score,res) => {
     questionnaireName: questionnaireName.value,
     time: year + '/' + month + '/' + day + '/ ' + hours + ':' + minutes,
     score: score,
-    report: res
+    report: res,
+    state: state
   }
   addRecord(record)
 }

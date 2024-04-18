@@ -43,3 +43,44 @@ export const getRecordByTime = (time,organization) => {
     }
   })
 }
+
+export const getRecordPass = (organization) => {
+  return request.get('/record/pass',{
+    params: {
+      organization: organization
+    }
+  })
+}
+
+export const getRecordFail = (organization) => {
+  return request.get('/record/fail',{
+    params: {
+      organization: organization
+    }
+  })
+}
+
+export const getRecordSeen = (organization) => {
+  return request.get('/record/seen',{
+    params: {
+      organization: organization
+    }
+  })
+}
+
+export const getRecordNotSeen = (organization) => {
+  return request.get('/record/notSeen',{
+    params: {
+      organization: organization
+    }
+  })
+}
+
+// 更新已读状态
+export const updateRecord = (id) => {
+  return request.get('/record/update',{
+    params: {
+      id: id
+    }
+  })
+}

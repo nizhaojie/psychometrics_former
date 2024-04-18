@@ -14,7 +14,8 @@
                         <el-select v-model="searchType" style="width: 115px">
                             <el-option label="发布者" value="发布者" />
                             <el-option label="创建时间" value="创建时间" />
-                            <el-option label="任务状态" value="任务状态" />
+                            <el-option label="未做" value="未做" />
+                            <el-option label="已做" value="已做" />
                         </el-select>
                     </template>
                     <template #append>
@@ -101,13 +102,16 @@ getTaskData(userInfoStore?.info?.username)
 const searchType = ref('关键词类型')
 // 搜索的关键词
 const searchParameter = ref('')
+
+const arr = ["未做","已做"]
+
 // 搜索函数
 const search = () => {
   if(searchType.value === '关键词类型') {
     ElMessage.error('请选择查询关键词的类型')
     return
   }
-  if(searchParameter.value.trim() === '') {
+  if(searchParameter.value.trim() === '' && !arr.includes(searchType.value)) {
     // 重置
     task.value = taskStore
     changePage(1)
@@ -117,9 +121,9 @@ const search = () => {
     task.value = taskStore.filter(item => item.giver.includes(searchParameter.value))
   } else if(searchType.value === '创建时间') {
     task.value = taskStore.filter(item => item.time.includes(searchParameter.value))
-  } else if(searchType.value === '任务状态' && searchParameter.value === '已做') {
+  } else if(searchType.value === '已做') {
     task.value = taskStore.filter(item => item.state === 1)
-  } else if(searchType.value === '任务状态' && searchParameter.value === '未做') {
+  } else if(searchType.value === '未做') {
     task.value = taskStore.filter(item => item.state === 0)
   } else task.value = []
   changePage(1)
