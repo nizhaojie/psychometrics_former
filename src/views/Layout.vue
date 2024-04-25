@@ -20,6 +20,13 @@
                     </el-icon>
                     <span>测评记录</span>
                 </el-menu-item>
+                <!-- 根据是否为管理员,呈现不同的数据概览页面 -->
+                <el-menu-item :index="administrator ? '/chart/administrator' : '/chart/user'">
+                    <el-icon>
+                        <TrendCharts />
+                    </el-icon>
+                    <span>数据概览</span>
+                </el-menu-item>
                    <!-- 根据是否为管理员,呈现不同的测评任务界面 -->
                 <el-menu-item :index="administrator ? '/task/giver' : '/task/receiver'">
                     <el-icon>
@@ -28,7 +35,7 @@
                     <span>测评任务</span>
                 </el-menu-item>
                   <!-- 根据是否为管理员,呈现不同的健康指导建议界面 -->
-                  <el-menu-item :index="administrator ? '/guidance/giver' : '/guidance/receiver'">
+                <el-menu-item :index="administrator ? '/guidance/giver' : '/guidance/receiver'">
                     <el-icon>
                         <Comment />
                     </el-icon>

@@ -19,6 +19,8 @@ const routes = [
             { path: '/guidance/detail', component: () => import("@/views/guidance/GuidanceDetail.vue") },
             { path: '/task/giver', component: () => import("@/views/task/TaskGiver.vue") },
             { path: '/task/receiver', component: () => import("@/views/task/TaskReceiver.vue") },
+            { path: '/chart/user', component: () => import("@/views/chart/ChartUser.vue") },
+            { path: '/chart/administrator', component: () => import("@/views/chart/ChartAdministrator.vue") },
         ]
     },
 ]

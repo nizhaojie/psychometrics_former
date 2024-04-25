@@ -7,9 +7,18 @@ export const addRecord = (record) => {
 
 // 根据用户id查询记录
 export const getRecord = (userId) => {
-  return request.get('/record',{
+  return request.get('/record/userId',{
     params: {
       userId: userId
+    }
+  })
+}
+
+// 根据组织查询记录
+export const getRecordByOrganization = (organization) => {
+  return request.get('/record/organization',{
+    params: {
+      organization: organization
     }
   })
 }
