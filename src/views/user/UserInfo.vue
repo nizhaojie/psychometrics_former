@@ -47,10 +47,23 @@ const rules = {
     ]
 }
 
+const isEmail = (email) => {
+    var regex = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
+    return regex.test(email);
+}
+
 //修改个人信息
 import { userInfoUpdateService } from '@/api/user.js'
 import { ElMessage } from 'element-plus'
 const updateUserInfo = async ()=>{
+    if(userInfo.value.nickname.length < 3 ||  userInfo.value.nickname.length > 10) {
+        ElMessage.error("昵称必须是3-10位的非空字符串")
+        return
+    }
+    if(!isEmail(userInfo.value.email)) {
+        ElMessage.error("邮箱格式不正确")
+        return
+    }
     //调用接口
     await userInfoUpdateService(userInfo.value);
     ElMessage.success('修改成功');

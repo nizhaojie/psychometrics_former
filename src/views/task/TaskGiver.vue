@@ -181,7 +181,7 @@ const toAddTask = async () => {
     return
   }
   if(taskModel.value.questionnaire === null) {
-    ElMessage.error("请输入测评问卷")
+    ElMessage.error("请选择测评问卷")
     return
   }
   let now = new Date();

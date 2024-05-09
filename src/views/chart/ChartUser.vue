@@ -126,7 +126,7 @@ onMounted(() => {
   setTimeout(()=>{
     option1 && myChart1.setOption(option1);
     option2 && myChart2.setOption(option2);
-  },100)
+  },500)
 })
 
 // 返回测评记录列表
